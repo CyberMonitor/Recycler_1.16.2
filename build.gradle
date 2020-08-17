@@ -1,0 +1,104 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+    }
+}
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+version = modMinecraftVersion + "-" + modVersion
+//version = '1.1.0'
+group = 'ga.poglej'
+archivesBaseName = 'recycler'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+minecraft {
+    //mappings channel: 'snapshot', version: '20190915-1.14.3'
+    mappings channel: modMcpMappingsChannel, version: modMcpMappingsVersion
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            // property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.noansi', 'false'
+            ideaModule "${project.name}.main"
+        }
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.noansi', 'false'
+            ideaModule "${project.name}.main"
+        }
+        data {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.noansi', 'false'
+            ideaModule "${project.name}.main"
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
+}
+
+dependencies {
+    //minecraft 'net.minecraftforge:forge:1.14.4-28.1.1'
+    minecraft "net.minecraftforge:forge:" + modMinecraftVersion + "-" + modForgeVersion
+
+    //compileOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.11:api")
+    //runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.11")
+    compileOnly "mezz.jei:jei-1.16.2:+"
+}
+
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "recycler",
+            "Specification-Vendor": "LepkoQQ",
+            "Specification-Version": "1",
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" : "LepkoQQ",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+
+// Create Sources Jar
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+build.dependsOn sourcesJar
+
+//// Create Javadoc Jar
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//  classifier = 'javadoc'
+//  from javadoc.destinationDir
+//}
+//build.dependsOn javadocJar
+
+artifacts {
+    archives sourcesJar
+//  archives javadocJar
+}
